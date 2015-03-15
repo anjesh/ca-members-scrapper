@@ -3,6 +3,7 @@
 
 import re
 import copy
+import csv
 from UnicodeConverter import UnicodeConverter
 
 class ProfileFields:
@@ -56,6 +57,47 @@ class ProfileFields:
 
     PUBLICATIONS = 130
     FOREIGN_VISITS = 140
+
+    @staticmethod
+    def getFieldOrder():
+        return [
+            ProfileFields.NAME,
+            ProfileFields.DOB,
+            ProfileFields.BIRTH_DISTRICT,
+            ProfileFields.BIRTH_VDC,
+            ProfileFields.BIRTH_WARD,
+            ProfileFields.PADDRESS_DISTRICT,
+            ProfileFields.PADDRESS_VDC,
+            ProfileFields.PADDRESS_WARD,
+            ProfileFields.PADDRESS_TOLE,
+            ProfileFields.KADDRESS_DISTRICT,
+            ProfileFields.KADDRESS_VDC,
+            ProfileFields.KADDRESS_WARD,
+            ProfileFields.KADDRESS_TOLE,
+            # ProfileFields.CONTACT_MOBILE,
+            # ProfileFields.CONTACT_EMAIL,
+            # ProfileFields.CONTACT_PHONE_VALLEY,
+            # ProfileFields.CONTACT_PHONE_DISTRICT,
+            # ProfileFields.FATHER_NAME,
+            # ProfileFields.MOTHER_NAME,
+            # ProfileFields.MARITAL_STATUS,
+            # ProfileFields.SPOUSE_NAME,
+            # ProfileFields.CHILDREN_SONS,
+            # ProfileFields.CHILDREN_DAUGHERS,
+            ProfileFields.EDUCATION_QUALIFICATION,
+            ProfileFields.EDUCATION_MAJOR,
+            # ProfileFields.ELECTION_PROCESS,
+            # ProfileFields.ELECTED_DISTRICT,
+            # ProfileFields.ELECTED_CONSTITUENCY,
+            ProfileFields.PARTY,
+            ProfileFields.PARTY_STARTED_YEAR,
+            # ProfileFields.POLITICAL_UNDERGROUND_YEARS,
+            # ProfileFields.POLITICAL_NIRWASAN_YEARS,
+            # ProfileFields.POLITICAL_PRISONED_STATUS,
+            # ProfileFields.PAST_EXPERIENCE,
+            # ProfileFields.PUBLICATIONS,
+            # ProfileFields.FOREIGN_VISITS,            
+        ]        
 
 class Profile: 
     def __init__(self):
@@ -123,6 +165,27 @@ class Profile:
             }
         return v
 
+class CSVProfileExport:
+    def __init__(self, filename, profiles):
+        self.outfile = open(filename, 'w')
+        self.csvwriter = csv.writer(self.outfile, delimiter=',',quotechar='"')
+        self.setProfiles(profiles)
+
+    def setProfiles(self, profiles):
+        self.profiles = profiles
+        self.process()
+
+    def process(self):
+        for p in self.profiles:
+            self.csvwriter.writerow(self.getCSVRow(p))
+
+    def getCSVRow(self, profile):
+        row = []
+        for field in ProfileFields.getFieldOrder():
+            row.append(profile.getUnicodeFieldValue(field).encode('utf-8'))
+        return row
+
+
 class ProfileMaintainer:
     def __init__(self):
         self.profile = Profile()
@@ -161,7 +224,13 @@ class LinePatternFinder:
         self.checkKAddressHeader() or self.checkKAddressDistrict() or self.checkKAddressVDC() or self.checkKAddressWard() or self.checkKAddressTole() or \
         self.checkEducationQualifcation() or self.checkEducationMajor() or \
         self.checkParty() or self.checkPartyStartedYear()
-            
+    
+    def getProfileId(self, line):
+        m = re.findall('<A name=([0-9]*)', line)
+        if m and m[0]:
+            return m[0]
+        return False
+
     def checkName(self):
         # <A name=1></a>df=  cOGb| ;'Gb/ g]DjfË<br>
         m = re.findall('df= (.*)', self.line)
@@ -324,8 +393,8 @@ class LinePatternFinder:
 
     def checkPartyStartedYear(self):
         #/fhgLlts bndf cfa4 ePsf] jif{ M lj=;= @)#^<br>
-        m = re.findall('/fhgLlts bndf cfa4 ePsf\] jif\{ M (.*)', self.line)
-        if m and m[0]:
+        m = re.findall('/fhgLlts bndf cfa4 ePsf\] jif\{ M(.*)', self.line)
+        if m and len(m):
             self.foundField = ProfileFields.PARTY_STARTED_YEAR
             self.value = m[0]
             return True

@@ -15,7 +15,11 @@ class ScaperTest(unittest.TestCase):
     def testName(self):
         self.scraper.setLine("<A name=1></a>df= cOGb| ;'Gb/ g]DjfË<br>")
         self.assertEqual(self.scraper.getFoundField(), ProfileFields.NAME);
-        self.assertEqual(self.scraper.getFieldValue(), "cOGb| ;'Gb/ g]DjfË");
+        self.assertEqual(self.scraper.getFieldValue(), "cOGb| ;'Gb/ g]DjfË")
+        self.scraper.setLine("<A name=11></a>df= c~hgf tfDnL<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.NAME)
+        self.assertEqual(self.scraper.getFieldValue(), "c~hgf tfDnL")
+
 
     def testDOB(self):
         self.scraper.setLine("hGd ldlt M </span><span class=\"ft7\">2034/07/12<br>")
@@ -116,6 +120,11 @@ class ScaperTest(unittest.TestCase):
         self.scraper.setLine("/fhgLlts bndf cfa4 ePsf] jif{ M lj=;= @)#^<br>")
         self.assertEqual(self.scraper.getFoundField(), ProfileFields.PARTY_STARTED_YEAR);
         self.assertEqual(self.scraper.getFieldValue(), "lj=;= @)#^");
+        self.scraper.setLine("/fhgLlts bndf cfa4 ePsf] jif{ M<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.PARTY_STARTED_YEAR);
+        self.assertEqual(self.scraper.getFieldValue(), "");
+
+
 
 
 unittest.main()

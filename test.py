@@ -13,9 +13,9 @@ class ScaperTest(unittest.TestCase):
         self.scraper =  LinePatternFinder()
 
     def testName(self):
-        self.scraper.setLine("<A name=1></a>df=  cOGb| ;'Gb/ g]DjfË<br>")
+        self.scraper.setLine("<A name=1></a>df= cOGb| ;'Gb/ g]DjfË<br>")
         self.assertEqual(self.scraper.getFoundField(), ProfileFields.NAME);
-        self.assertEqual(self.scraper.getFieldValue(), "df=  cOGb| ;'Gb/ g]DjfË");
+        self.assertEqual(self.scraper.getFieldValue(), "cOGb| ;'Gb/ g]DjfË");
 
     def testDOB(self):
         self.scraper.setLine("hGd ldlt M </span><span class=\"ft7\">2034/07/12<br>")
@@ -111,7 +111,6 @@ class ScaperTest(unittest.TestCase):
         self.scraper.setLine("bnLo ;+nUgtf M t/fO{­dw]z nf]stflGqs kf6L{<br>")
         self.assertEqual(self.scraper.getFoundField(), ProfileFields.PARTY);
         self.assertEqual(self.scraper.getFieldValue(), "t/fO{­dw]z nf]stflGqs kf6L{");
-
 
     def testPartyStartedYear(self):
         self.scraper.setLine("/fhgLlts bndf cfa4 ePsf] jif{ M lj=;= @)#^<br>")

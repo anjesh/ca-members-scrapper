@@ -2,6 +2,8 @@
 # coding: windows-1252
 
 import re
+import copy
+from UnicodeConverter import UnicodeConverter
 
 class ProfileFields:
     NAME = 100
@@ -57,17 +59,81 @@ class ProfileFields:
 
 class Profile: 
     def __init__(self):
-        self.values = {}
+        self.uniconv = UnicodeConverter()
+        self.reset()
         pass
+
+    def reset(self):
+        self.values = {}
 
     def __str__(self):
         s = ""
         for f in self.values:
-            s = s + "\r\nField " + str(f) + ": " + self.values[f]
+            s = s + "\r\nField " + str(f) + ": " + getUnicodeFieldValue(self.values[f])
         return s
 
     def setFieldValue(self, field, value):
         self.values[field] = value
+
+    def getUnicodeFieldValue(self, field):
+        if field in self.values:
+            val = self.values[field]
+            valUnicode = self.uniconv.convert(val)
+            error = ' [x]' if self.uniconv.hasNonAscii() else '';
+            return (valUnicode + error)
+        return ""
+
+    def getAllValues(self):
+        v = {
+                "NAME": self.getUnicodeFieldValue(ProfileFields.NAME),
+                "DOB": self.getUnicodeFieldValue(ProfileFields.DOB),
+                "BIRTH_DISTRICT": self.getUnicodeFieldValue(ProfileFields.BIRTH_DISTRICT),
+                "BIRTH_VDC": self.getUnicodeFieldValue(ProfileFields.BIRTH_VDC),
+                "BIRTH_WARD": self.getUnicodeFieldValue(ProfileFields.BIRTH_WARD),
+                "PADDRESS_DISTRICT": self.getUnicodeFieldValue(ProfileFields.PADDRESS_DISTRICT),
+                "PADDRESS_VDC": self.getUnicodeFieldValue(ProfileFields.PADDRESS_VDC),
+                "PADDRESS_WARD": self.getUnicodeFieldValue(ProfileFields.PADDRESS_WARD),
+                "PADDRESS_TOLE": self.getUnicodeFieldValue(ProfileFields.PADDRESS_TOLE),
+                "KADDRESS_DISTRICT": self.getUnicodeFieldValue(ProfileFields.KADDRESS_DISTRICT),
+                "KADDRESS_VDC": self.getUnicodeFieldValue(ProfileFields.KADDRESS_VDC),
+                "KADDRESS_WARD": self.getUnicodeFieldValue(ProfileFields.KADDRESS_WARD),
+                "KADDRESS_TOLE": self.getUnicodeFieldValue(ProfileFields.KADDRESS_TOLE),
+                "CONTACT_EMAIL": self.getUnicodeFieldValue(ProfileFields.CONTACT_EMAIL),
+                "CONTACT_PHONE_VALLEY ": self.getUnicodeFieldValue(ProfileFields.CONTACT_PHONE_VALLEY),
+                "CONTACT_PHONE_DISTRICT": self.getUnicodeFieldValue(ProfileFields.CONTACT_PHONE_DISTRICT),
+                "FATHER_NAME": self.getUnicodeFieldValue(ProfileFields.FATHER_NAME),
+                "MOTHER_NAME": self.getUnicodeFieldValue(ProfileFields.MOTHER_NAME),
+                "MARITAL_STATUS": self.getUnicodeFieldValue(ProfileFields.MARITAL_STATUS),
+                "SPOUSE_NAME": self.getUnicodeFieldValue(ProfileFields.SPOUSE_NAME),
+                "CHILDREN_SONS": self.getUnicodeFieldValue(ProfileFields.CHILDREN_SONS),
+                "CHILDREN_DAUGHERS": self.getUnicodeFieldValue(ProfileFields.CHILDREN_DAUGHERS),
+                "EDUCATION_QUALIFICATION": self.getUnicodeFieldValue(ProfileFields.EDUCATION_QUALIFICATION),
+                "EDUCATION_MAJOR": self.getUnicodeFieldValue(ProfileFields.EDUCATION_MAJOR),
+                "ELECTION_PROCESS": self.getUnicodeFieldValue(ProfileFields.ELECTION_PROCESS),
+                "ELECTED_DISTRICT": self.getUnicodeFieldValue(ProfileFields.ELECTED_DISTRICT),
+                "ELECTED_CONSTITUENCY ": self.getUnicodeFieldValue(ProfileFields.ELECTED_CONSTITUENCY),
+                "PARTY": self.getUnicodeFieldValue(ProfileFields.PARTY),
+                "PARTY_STARTED_YEAR": self.getUnicodeFieldValue(ProfileFields.PARTY_STARTED_YEAR),
+                "POLITICAL_UNDERGROUND_YEARS": self.getUnicodeFieldValue(ProfileFields.POLITICAL_UNDERGROUND_YEARS),
+                "POLITICAL_NIRWASAN_YEARS": self.getUnicodeFieldValue(ProfileFields.POLITICAL_NIRWASAN_YEARS),
+                "POLITICAL_PRISONED_STATUS": self.getUnicodeFieldValue(ProfileFields.POLITICAL_PRISONED_STATUS),
+                "PAST_EXPERIENCE": self.getUnicodeFieldValue(ProfileFields.PAST_EXPERIENCE),
+                "PUBLICATIONS": self.getUnicodeFieldValue(ProfileFields.PUBLICATIONS),
+                "FOREIGN_VISITS": self.getUnicodeFieldValue(ProfileFields.FOREIGN_VISITS),
+            }
+        return v
+
+class ProfileMaintainer:
+    def __init__(self):
+        self.profile = Profile()
+        self.profiles = []
+
+    def setLinePatternFinder(self, linePatternFinder):
+        if linePatternFinder.getFoundField():
+            self.profile.setFieldValue(linePatternFinder.getFoundField(), linePatternFinder.getFieldValue())
+        if linePatternFinder.getFoundField() == ProfileFields.PARTY_STARTED_YEAR:
+            self.profiles.append(copy.copy(self.profile))
+            self.profile.reset()
 
 class LinePatternFinder:
     def __init__(self):
@@ -75,17 +141,17 @@ class LinePatternFinder:
         pass
 
     def setLine(self, line):
-        self.line = line
-        self.found = False
+        #remove tags
+        self.line = re.sub('<[^>]*>', '', line).strip()
         self.foundField = False
         self.value = False;
-        self.process();
+        self.process()
 
     def getFoundField(self):
         return self.foundField;
 
     def getFieldValue(self):
-        return self.value
+        return self.value.strip()
 
     def process(self):
         self.checkName() or \
@@ -94,14 +160,12 @@ class LinePatternFinder:
         self.checkPAddressHeader() or self.checkPAddressDistrict() or self.checkPAddressVDC() or self.checkPAddressWard() or self.checkPAddressTole() or \
         self.checkKAddressHeader() or self.checkKAddressDistrict() or self.checkKAddressVDC() or self.checkKAddressWard() or self.checkKAddressTole() or \
         self.checkEducationQualifcation() or self.checkEducationMajor() or \
-        self.checkParty() or self.checkPartyStartedYear() or \
-        1
+        self.checkParty() or self.checkPartyStartedYear()
             
     def checkName(self):
         # <A name=1></a>df=  cOGb| ;'Gb/ g]DjfË<br>
-        m = re.findall('<A name=[0-9]*></a>([^<]*)<', self.line)
+        m = re.findall('df= (.*)', self.line)
         if m and m[0]:
-            self.stage = 0;            
             self.foundField = ProfileFields.NAME
             self.value = m[0]
             return True
@@ -109,7 +173,7 @@ class LinePatternFinder:
 
     def checkDob(self):
         # hGd ldlt M </span><span class="ft7">2034/07/12<br>
-        m = re.findall('hGd ldlt M </span><span[^>]*>([^<]*)<', self.line)
+        m = re.findall('hGd ldlt M (.*)', self.line)
         if m and m[0]:
             self.foundField = ProfileFields.DOB
             self.value = m[0]
@@ -118,7 +182,7 @@ class LinePatternFinder:
 
     def checkBirthDistrict(self):
         # hGd :yfg M lhNnf M kfFry/<br>
-        m = re.findall('hGd :yfg M ([^<]*)<', self.line)
+        m = re.findall('hGd :yfg M (.*)', self.line)
         if m and m[0]:
             self.stage = ProfileFields.BIRTH_HEADER
             self.foundField = ProfileFields.BIRTH_DISTRICT
@@ -128,7 +192,7 @@ class LinePatternFinder:
 
     def checkBirthVDC(self):
         # uf=lj=;=÷g=kf= M ODj'ª<br>
-        m = re.findall('uf=lj=;=÷g=kf= M ([^<]*)<', self.line)
+        m = re.findall('uf=lj=;=÷g=kf= M (.*)', self.line)
         if self.stage == ProfileFields.BIRTH_HEADER and m and m[0]:
             self.foundField = ProfileFields.BIRTH_VDC
             self.value = m[0]
@@ -137,7 +201,7 @@ class LinePatternFinder:
 
     def checkBirthWard(self):
         # j8f g+= M !<br>
-        m = re.findall('j8f g\+= M ([^<]*)<', self.line)
+        m = re.findall('j8f g\+= M (.*)', self.line)
         if self.stage == ProfileFields.BIRTH_HEADER and m and m[0]:
             self.foundField = ProfileFields.BIRTH_WARD
             self.value = m[0]
@@ -155,7 +219,7 @@ class LinePatternFinder:
 
     def checkPAddressDistrict(self):
         #lhNnf M kfFry/<br>
-        m = re.findall('lhNnf M ([^<]*)<', self.line)
+        m = re.findall('lhNnf M (.*)', self.line)
         if self.stage == ProfileFields.PADDRESS_HEADER and m and m[0]:
             self.foundField = ProfileFields.PADDRESS_DISTRICT
             self.value = m[0]
@@ -164,7 +228,7 @@ class LinePatternFinder:
 
     def checkPAddressVDC(self):
         #lhNnf M kfFry/<br>
-        m = re.findall('uf=lj=;=÷g=kf= M ([^<]*)<', self.line)
+        m = re.findall('uf=lj=;=÷g=kf= M (.*)', self.line)
         if self.stage == ProfileFields.PADDRESS_HEADER and m and m[0]:
             self.foundField = ProfileFields.PADDRESS_VDC
             self.value = m[0]
@@ -173,7 +237,7 @@ class LinePatternFinder:
 
     def checkPAddressWard(self):
         #lhNnf M kfFry/<br>
-        m = re.findall('j8f g\+= M ([^<]*)<', self.line)
+        m = re.findall('j8f g\+= M (.*)', self.line)
         if self.stage == ProfileFields.PADDRESS_HEADER and m and m[0]:
             self.foundField = ProfileFields.PADDRESS_WARD
             self.value = m[0]
@@ -182,7 +246,7 @@ class LinePatternFinder:
 
     def checkPAddressTole(self):
         #6f]n M em08]gu/<br>
-        m = re.findall('6f]n M ([^<]*)<', self.line)
+        m = re.findall('6f]n M (.*)', self.line)
         if self.stage == ProfileFields.PADDRESS_HEADER and m and m[0]:
             self.foundField = ProfileFields.PADDRESS_TOLE
             self.value = m[0]
@@ -190,7 +254,7 @@ class LinePatternFinder:
         return False
 
     def checkKAddressHeader(self):
-        m = re.findall('sf7df08f} pkTosfsf] 7]ufgf M<br>', self.line)
+        m = re.findall('sf7df08f} pkTosfsf] 7]ufgf M', self.line)
         if m and m[0]:
             self.stage = ProfileFields.KADDRESS_HEADER
             self.foundField = ProfileFields.KADDRESS_HEADER
@@ -200,7 +264,7 @@ class LinePatternFinder:
 
     def checkKAddressDistrict(self):
         #lhNnf M kfFry/<br>
-        m = re.findall('lhNnf M ([^<]*)<', self.line)
+        m = re.findall('lhNnf M (.*)', self.line)
         if self.stage == ProfileFields.KADDRESS_HEADER and m and m[0]:
             self.foundField = ProfileFields.KADDRESS_DISTRICT
             self.value = m[0]
@@ -208,7 +272,7 @@ class LinePatternFinder:
         return False
 
     def checkKAddressVDC(self):
-        m = re.findall('uf=lj=;=÷g=kf= M ([^<]*)<', self.line)
+        m = re.findall('uf=lj=;=÷g=kf= M (.*)', self.line)
         if self.stage == ProfileFields.KADDRESS_HEADER and m and m[0]:
             self.foundField = ProfileFields.KADDRESS_VDC
             self.value = m[0]
@@ -216,7 +280,7 @@ class LinePatternFinder:
         return False
 
     def checkKAddressWard(self):
-        m = re.findall('j8f g\+= M ([^<]*)<', self.line)
+        m = re.findall('j8f g\+= M (.*)', self.line)
         if self.stage == ProfileFields.KADDRESS_HEADER and m and m[0]:
             self.foundField = ProfileFields.KADDRESS_WARD
             self.value = m[0]
@@ -224,7 +288,7 @@ class LinePatternFinder:
         return False
 
     def checkKAddressTole(self):
-        m = re.findall('6f\]n M ([^<]*)<', self.line)
+        m = re.findall('6f\]n M (.*)', self.line)
         if self.stage == ProfileFields.KADDRESS_HEADER and m and m[0]:
             self.foundField = ProfileFields.KADDRESS_TOLE
             self.value = m[0]
@@ -233,7 +297,7 @@ class LinePatternFinder:
 
     def checkEducationQualifcation(self):
         #z}lIfs of]Uotf M :gfts<br>
-        m = re.findall('z\}lIfs of\]Uotf M ([^<]*)<', self.line)
+        m = re.findall('z\}lIfs of\]Uotf M (.*)', self.line)
         if m and m[0]:
             self.foundField = ProfileFields.EDUCATION_QUALIFICATION
             self.value = m[0]
@@ -242,7 +306,7 @@ class LinePatternFinder:
 
     def checkEducationMajor(self):
         #cWoogsf] ljifo M dfgljsL<br>
-        m = re.findall('cWoogsf\] ljifo M ([^<]*)<', self.line)
+        m = re.findall('cWoogsf\] ljifo M (.*)', self.line)
         if m and m[0]:
             self.foundField = ProfileFields.EDUCATION_MAJOR
             self.value = m[0]
@@ -251,7 +315,7 @@ class LinePatternFinder:
 
     def checkParty(self):
         #bnLo ;+nUgtf M t/fO{­dw]z nf]stflGqs kf6L{<br>
-        m = re.findall('bnLo ;\+nUgtf M ([^<]*)<', self.line)
+        m = re.findall('bnLo ;\+nUgtf M (.*)', self.line)
         if m and m[0]:
             self.foundField = ProfileFields.PARTY
             self.value = m[0]
@@ -260,20 +324,9 @@ class LinePatternFinder:
 
     def checkPartyStartedYear(self):
         #/fhgLlts bndf cfa4 ePsf] jif{ M lj=;= @)#^<br>
-        m = re.findall('/fhgLlts bndf cfa4 ePsf\] jif\{ M ([^<]*)<', self.line)
+        m = re.findall('/fhgLlts bndf cfa4 ePsf\] jif\{ M (.*)', self.line)
         if m and m[0]:
             self.foundField = ProfileFields.PARTY_STARTED_YEAR
             self.value = m[0]
             return True
         return False
-
-
-
-
-
-
-
-
-
-
-

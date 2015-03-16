@@ -11,12 +11,11 @@ It scrapes the members profile of Constituent Assembly (CA) of Nepal from the [P
 * ProfileMaintainer maintains the collection of profiles 
 * CSVProfileExport takes the collection of profiles and generates csv file
 
-### Run
+## Setup
 
 * Clone the repo
-* 
-
-`python run.py`
+* `git submodule init`
+* `git submodule update`
 
 ### Test
 
@@ -24,5 +23,18 @@ The tests only covers the LinePatternFinder only.
 
 `python -m unittest tests.patternFinderTest`
 
-### TOODs
+### Run
+
+* `python run.py`
+* `out/profiles.csv` will be created
+
+## TODOs
+
+* Scrape all the fields
+* Write more tests 
+
+## Problems
+
+* There are non ascii characters so they couldn't be converted to Unicode. They are ignored and [x] is added to the value to make manual fixes
+
 

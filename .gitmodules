@@ -1,0 +1,3 @@
+[submodule "nep_ttf2utf"]
+	path = nep_ttf2utf
+	url = https://github.com/anjesh/nep-ttf2utf.git

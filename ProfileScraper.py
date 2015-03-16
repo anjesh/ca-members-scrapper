@@ -125,46 +125,6 @@ class Profile:
             return (valUnicode + error)
         return ""
 
-    def getAllValues(self):
-        v = {
-                "NAME": self.getUnicodeFieldValue(ProfileFields.NAME),
-                "DOB": self.getUnicodeFieldValue(ProfileFields.DOB),
-                "BIRTH_DISTRICT": self.getUnicodeFieldValue(ProfileFields.BIRTH_DISTRICT),
-                "BIRTH_VDC": self.getUnicodeFieldValue(ProfileFields.BIRTH_VDC),
-                "BIRTH_WARD": self.getUnicodeFieldValue(ProfileFields.BIRTH_WARD),
-                "PADDRESS_DISTRICT": self.getUnicodeFieldValue(ProfileFields.PADDRESS_DISTRICT),
-                "PADDRESS_VDC": self.getUnicodeFieldValue(ProfileFields.PADDRESS_VDC),
-                "PADDRESS_WARD": self.getUnicodeFieldValue(ProfileFields.PADDRESS_WARD),
-                "PADDRESS_TOLE": self.getUnicodeFieldValue(ProfileFields.PADDRESS_TOLE),
-                "KADDRESS_DISTRICT": self.getUnicodeFieldValue(ProfileFields.KADDRESS_DISTRICT),
-                "KADDRESS_VDC": self.getUnicodeFieldValue(ProfileFields.KADDRESS_VDC),
-                "KADDRESS_WARD": self.getUnicodeFieldValue(ProfileFields.KADDRESS_WARD),
-                "KADDRESS_TOLE": self.getUnicodeFieldValue(ProfileFields.KADDRESS_TOLE),
-                "CONTACT_EMAIL": self.getUnicodeFieldValue(ProfileFields.CONTACT_EMAIL),
-                "CONTACT_PHONE_VALLEY ": self.getUnicodeFieldValue(ProfileFields.CONTACT_PHONE_VALLEY),
-                "CONTACT_PHONE_DISTRICT": self.getUnicodeFieldValue(ProfileFields.CONTACT_PHONE_DISTRICT),
-                "FATHER_NAME": self.getUnicodeFieldValue(ProfileFields.FATHER_NAME),
-                "MOTHER_NAME": self.getUnicodeFieldValue(ProfileFields.MOTHER_NAME),
-                "MARITAL_STATUS": self.getUnicodeFieldValue(ProfileFields.MARITAL_STATUS),
-                "SPOUSE_NAME": self.getUnicodeFieldValue(ProfileFields.SPOUSE_NAME),
-                "CHILDREN_SONS": self.getUnicodeFieldValue(ProfileFields.CHILDREN_SONS),
-                "CHILDREN_DAUGHERS": self.getUnicodeFieldValue(ProfileFields.CHILDREN_DAUGHERS),
-                "EDUCATION_QUALIFICATION": self.getUnicodeFieldValue(ProfileFields.EDUCATION_QUALIFICATION),
-                "EDUCATION_MAJOR": self.getUnicodeFieldValue(ProfileFields.EDUCATION_MAJOR),
-                "ELECTION_PROCESS": self.getUnicodeFieldValue(ProfileFields.ELECTION_PROCESS),
-                "ELECTED_DISTRICT": self.getUnicodeFieldValue(ProfileFields.ELECTED_DISTRICT),
-                "ELECTED_CONSTITUENCY ": self.getUnicodeFieldValue(ProfileFields.ELECTED_CONSTITUENCY),
-                "PARTY": self.getUnicodeFieldValue(ProfileFields.PARTY),
-                "PARTY_STARTED_YEAR": self.getUnicodeFieldValue(ProfileFields.PARTY_STARTED_YEAR),
-                "POLITICAL_UNDERGROUND_YEARS": self.getUnicodeFieldValue(ProfileFields.POLITICAL_UNDERGROUND_YEARS),
-                "POLITICAL_NIRWASAN_YEARS": self.getUnicodeFieldValue(ProfileFields.POLITICAL_NIRWASAN_YEARS),
-                "POLITICAL_PRISONED_STATUS": self.getUnicodeFieldValue(ProfileFields.POLITICAL_PRISONED_STATUS),
-                "PAST_EXPERIENCE": self.getUnicodeFieldValue(ProfileFields.PAST_EXPERIENCE),
-                "PUBLICATIONS": self.getUnicodeFieldValue(ProfileFields.PUBLICATIONS),
-                "FOREIGN_VISITS": self.getUnicodeFieldValue(ProfileFields.FOREIGN_VISITS),
-            }
-        return v
-
 class CSVProfileExport:
     def __init__(self, filename, profiles):
         self.outfile = open(filename, 'w')

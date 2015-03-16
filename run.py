@@ -8,7 +8,7 @@ from ProfileScraper import *
 
 profileMaintainer = ProfileMaintainer();
 
-with open('Member_of_CA_from_Serial_No.1-319s.html','rU') as f:
+with open('in/Member_of_CA_from_Serial_No.1-319s.html','rU') as f:
     scraper =  LinePatternFinder()
     count = 1
     for line in f:
@@ -21,7 +21,7 @@ with open('Member_of_CA_from_Serial_No.1-319s.html','rU') as f:
                 count += 1
             profileMaintainer.setLinePatternFinder(scraper)
 
-with open('Member_of_CA_Serial_No.320_to_597s.html','rU') as f:
+with open('in/Member_of_CA_Serial_No.320_to_597s.html','rU') as f:
     scraper =  LinePatternFinder()
     for line in f:
         scraper.setLine(line)
@@ -31,7 +31,7 @@ with open('Member_of_CA_Serial_No.320_to_597s.html','rU') as f:
                 print "Scrapped profile " + profileId 
             profileMaintainer.setLinePatternFinder(scraper)
 
-CSVProfileExport("profiles.csv", profileMaintainer.profiles)
+CSVProfileExport("out/profiles.csv", profileMaintainer.profiles)
 
 
 

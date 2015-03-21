@@ -37,7 +37,7 @@ class ProfileFields:
     MARITAL_STATUS = 112
     SPOUSE_NAME = 113
     CHILDREN_SONS =  114
-    CHILDREN_DAUGHERS = 115
+    CHILDREN_DAUGHTERS = 115
 
     EDUCATION_QUALIFICATION = 120
     EDUCATION_MAJOR = 121
@@ -78,16 +78,16 @@ class ProfileFields:
             ProfileFields.KADDRESS_VDC,
             ProfileFields.KADDRESS_WARD,
             ProfileFields.KADDRESS_TOLE,
-            # ProfileFields.CONTACT_MOBILE,
-            # ProfileFields.CONTACT_EMAIL,
-            # ProfileFields.CONTACT_PHONE_VALLEY,
-            # ProfileFields.CONTACT_PHONE_DISTRICT,
-            # ProfileFields.FATHER_NAME,
-            # ProfileFields.MOTHER_NAME,
-            # ProfileFields.MARITAL_STATUS,
-            # ProfileFields.SPOUSE_NAME,
-            # ProfileFields.CHILDREN_SONS,
-            # ProfileFields.CHILDREN_DAUGHERS,
+            ProfileFields.CONTACT_MOBILE,
+            ProfileFields.CONTACT_EMAIL,
+            ProfileFields.CONTACT_PHONE_VALLEY,
+            ProfileFields.CONTACT_PHONE_DISTRICT,
+            ProfileFields.FATHER_NAME,
+            ProfileFields.MOTHER_NAME,
+            ProfileFields.MARITAL_STATUS,
+            ProfileFields.SPOUSE_NAME,
+            ProfileFields.CHILDREN_SONS,
+            ProfileFields.CHILDREN_DAUGHTERS,
             ProfileFields.EDUCATION_QUALIFICATION,
             ProfileFields.EDUCATION_MAJOR,
             ProfileFields.ELECTED_PROCESS,
@@ -130,7 +130,7 @@ class ProfileFields:
             ProfileFields.MARITAL_STATUS : "Marital_status",
             ProfileFields.SPOUSE_NAME : "Spouse_name",
             ProfileFields.CHILDREN_SONS : "Children_sons",
-            ProfileFields.CHILDREN_DAUGHERS : "Children_daughers",
+            ProfileFields.CHILDREN_DAUGHTERS : "Children_daughers",
             ProfileFields.EDUCATION_QUALIFICATION : "Education_qualification",
             ProfileFields.EDUCATION_MAJOR : "Education_major",
             ProfileFields.ELECTED_PROCESS : "Elected_process",
@@ -170,7 +170,7 @@ class Profile:
         self.values[field] = value.strip()
 
     def translateNumbers(self, field, value):
-        if field in [ProfileFields.DOB, ProfileFields.PAGE_NUMBER]:
+        if field in [ProfileFields.DOB, ProfileFields.PAGE_NUMBER, ProfileFields.CONTACT_MOBILE, ProfileFields.CONTACT_PHONE_DISTRICT, ProfileFields.CONTACT_PHONE_VALLEY]:
             replaceDict = {'1':'!','2':'@','3':'#','4':'$','5':'%','6':'^','7':'&','8':'*','9':'(','0':')','/':'='} 
             for key, replacement in replaceDict.items():  
                 value = value.replace(key, replacement)
@@ -182,6 +182,11 @@ class Profile:
         if m and m[0]:
             return True
         return False
+
+    def getValue(self, field):
+        if field in self.values:
+            return self.values[field]
+        return ""
 
     def getUnicodeFieldValue(self, field):
         if field in self.values:
@@ -218,7 +223,10 @@ class CSVProfileExport:
     def getCSVRow(self, profile):
         row = []
         for field in ProfileFields.getFieldOrder():
-            row.append(profile.getUnicodeFieldValue(field).encode('utf-8'))
+            if field in [ProfileFields.CONTACT_EMAIL]:
+                row.append(profile.getValue(field))
+            else:
+                row.append(profile.getUnicodeFieldValue(field).encode('utf-8'))
         return row
 
 
@@ -265,6 +273,9 @@ class LinePatternFinder:
         self.checkBirthDistrictVDC() or self.checkBirthDistrict() or self.checkBirthVDC() or self.checkBirthWard() or \
         self.checkPAddressHeader() or self.checkPAddressDistrict() or self.checkPAddressVDC() or self.checkPAddressWard() or self.checkPAddressTole() or \
         self.checkKAddressHeader() or self.checkKAddressDistrict() or self.checkKAddressVDC() or self.checkKAddressWard() or self.checkKAddressTole() or \
+        self.checkContactMobileAndPhoneValley() or self.checkContactEmailAndPhoneValley() or \
+        self.checkContactMobile() or self.checkContactEmail() or self.checkPhoneValley() or self.checkPhoneDistrict() or \
+        self.checkFatherName() or self.checkMotherName() or self.checkSpouseName() or self.checkSonCount() or self.checkDaughterCount() or \
         self.checkEducationQualifcation() or self.checkEducationMajor() or \
         self.checkParty() or self.checkPartyStartedYear() or \
         self.checkElectedProcess() or self.checkElectedDistrict() or self.checkElectedConstituency() or \
@@ -427,10 +438,111 @@ class LinePatternFinder:
             return True
         return False
 
+    def checkContactMobileAndPhoneValley(self):
+        # there are cases where both mobile and phone-valley are in the same line, put that in the email
+        # df]afOn M 9851143079, 9801143079 lgjf; -pkTosf_ M )!Â­$))))!%
+        m = re.findall('df]afOn M(.*)lgjf; -pkTosf_ M(.*)', self.line)
+        if m and len(m):
+            self.foundField = ProfileFields.CONTACT_MOBILE
+            self.value = m[0][0] + "," + m[0][1]
+            return True
+        return False
+
+    def checkContactMobile(self):
+        #df]afOn M 9851032405
+        m = re.findall('df\]afOn M(.*)', self.line)
+        if m and m[0]:
+            self.foundField = ProfileFields.CONTACT_MOBILE
+            self.value = m[0]
+            return True
+        return False
+
+    def checkContactEmailAndPhoneValley(self):
+        # there are cases where both email and phone-district are in the same line, put that in the email
+        # Od]n M paudel.ananta@yahoo.com lgjf; -lhNNff_ M
+        m = re.findall('Od]n M(.*)lgjf; -lhNNff_ M(.*)', self.line)
+        if m and len(m):
+            self.foundField = ProfileFields.CONTACT_EMAIL
+            self.value = m[0][0] + "," + m[0][1]
+            return True
+        return False
+
+    def checkContactEmail(self):
+        # Od]n M arjunnkc@gmail.com
+        m = re.findall('Od]n M(.*)', self.line)
+        if m and len(m):
+            self.foundField = ProfileFields.CONTACT_EMAIL
+            self.value = m[0]
+            return True
+        return False
+
+    def checkPhoneValley(self):
+        # lgjf; -pkTosf_ M 01-433270
+        m = re.findall('lgjf; -pkTosf_ M(.*)', self.line)
+        if m and len(m):
+            self.foundField = ProfileFields.CONTACT_PHONE_VALLEY
+            self.value = m[0]
+            return True
+        return False
+
+    def checkPhoneDistrict(self):
+        # lgjf; -lhNNff_ M
+        m = re.findall('lgjf; -lhNNff_ M(.*)', self.line)
+        if m and len(m):
+            self.foundField = ProfileFields.CONTACT_PHONE_DISTRICT
+            self.value = m[0]
+            return True
+        return False
+
+    def checkFatherName(self):
+        # afa'sf] gfd M cAb'nf ;nfd zfx
+        m = re.findall('afa\'sf\] gfd M(.*)', self.line)
+        if m and len(m):
+            self.foundField = ProfileFields.FATHER_NAME
+            self.value = m[0]
+            return True
+        return False
+
+    def checkMotherName(self):
+        # cfdfsf] gfd M cfP;f vft'g
+        m = re.findall('cfdfsf\] gfd M(.*)', self.line)
+        if m and len(m):
+            self.foundField = ProfileFields.MOTHER_NAME
+            self.value = m[0]
+            return True
+        return False
+
+    def checkSpouseName(self):
+        #klt÷kTgLsf] gfd M gkmL; hFxf zfx
+        m = re.findall('klt÷kTgLsf\] gfd M(.*)', self.line)
+        if m and len(m):
+            self.foundField = ProfileFields.SPOUSE_NAME
+            self.value = m[0]
+            return True
+        return False
+
+    def checkSonCount(self):
+        #5f]/f M #
+        m = re.findall('5f\]\/f M(.*)', self.line)
+        if m and len(m):
+            self.foundField = ProfileFields.CHILDREN_SONS
+            self.value = m[0]
+            return True
+        return False
+
+    def checkDaughterCount(self):
+        #5f]/L M @
+        m = re.findall('5f\]/L M(.*)', self.line)
+        if m and len(m):
+            self.foundField = ProfileFields.CHILDREN_DAUGHTERS
+            self.value = m[0]
+            return True
+        return False
+
     def checkEducationQualifcation(self):
         #z}lIfs of]Uotf M :gfts<br>
-        m = re.findall('z\}lIfs of\]Uotf M (.*)', self.line)
-        if m and m[0]:
+        m = re.findall('z\}lIfs of\]Uotf M(.*)', self.line)
+        if m and len(m):
             self.foundField = ProfileFields.EDUCATION_QUALIFICATION
             self.value = m[0]
             return True

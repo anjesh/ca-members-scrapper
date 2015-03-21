@@ -105,6 +105,51 @@ class PatternFinderTest(unittest.TestCase):
         self.assertEqual(self.scraper.getFoundField(), ProfileFields.KADDRESS_TOLE);
         self.assertEqual(self.scraper.getFieldValue(), "em08]gu/");
 
+    def testFatherName(self):
+        self.scraper.setLine("afa'sf] gfd M cAb'nf ;nfd zfx<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.FATHER_NAME);
+        self.assertEqual(self.scraper.getFieldValue(), "cAb'nf ;nfd zfx");
+
+    def testMotherName(self):
+        self.scraper.setLine("cfdfsf] gfd M cfP;f vft'g<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.MOTHER_NAME);
+        self.assertEqual(self.scraper.getFieldValue(), "cfP;f vft'g");
+
+    def testSpouseName(self):
+        self.scraper.setLine("klt÷kTgLsf] gfd M gkmL; hFxf zfx<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.SPOUSE_NAME);
+        self.assertEqual(self.scraper.getFieldValue(), "gkmL; hFxf zfx");
+
+    def testSonCount(self):
+        self.scraper.setLine("5f]/f M #<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.CHILDREN_SONS);
+        self.assertEqual(self.scraper.getFieldValue(), "#");
+
+    def testDaughterCount(self):
+        self.scraper.setLine("5f]/L M @<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.CHILDREN_DAUGHTERS);
+        self.assertEqual(self.scraper.getFieldValue(), "@");
+
+    def testContactMobile(self):
+        self.scraper.setLine("df]afOn M 9851032405<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.CONTACT_MOBILE);
+        self.assertEqual(self.scraper.getFieldValue(), "9851032405");
+
+    def testContacteEmail(self):
+        self.scraper.setLine("Od]n M arjunnkc@gmail.com<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.CONTACT_EMAIL);
+        self.assertEqual(self.scraper.getFieldValue(), "arjunnkc@gmail.com");
+
+    def testPhoneValley(self):
+        self.scraper.setLine("lgjf; -pkTosf_ M 01-433270<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.CONTACT_PHONE_VALLEY);
+        self.assertEqual(self.scraper.getFieldValue(), "01-433270");
+
+    def testPhoneDistrict(self):
+        self.scraper.setLine("lgjf; -lhNNff_ M<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.CONTACT_PHONE_DISTRICT);
+        self.assertEqual(self.scraper.getFieldValue(), "");
+
     def testEducationQualification(self):
         self.scraper.setLine("z}lIfs of]Uotf M :gfts<br>")
         self.assertEqual(self.scraper.getFoundField(), ProfileFields.EDUCATION_QUALIFICATION);

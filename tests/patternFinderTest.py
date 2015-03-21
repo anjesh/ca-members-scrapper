@@ -5,7 +5,7 @@ import sys
 
 from ProfileScraper import *
 
-class ScraperTest(unittest.TestCase):
+class PatternFinderTest(unittest.TestCase):
     def setUp(self):
         self.profile = Profile();
         self.scraper =  LinePatternFinder()
@@ -23,13 +23,20 @@ class ScraperTest(unittest.TestCase):
         self.assertEqual(self.scraper.getFoundField(), ProfileFields.DOB);
         self.assertEqual(self.scraper.getFieldValue(), "2034/07/12");
 
-    def testBirthDistrict(self):
+    def testBirthDistrictVDC(self):        
+        #hGd :yfg M lhNnf M slkna:t' uf=lj=;=÷g=kf= M si0fgu/
+        self.scraper.setLine("hGd :yfg M lhNnf M slkna:t' uf=lj=;=÷g=kf= M si0fgu/<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.BIRTH_DISTRICT);
+        self.assertEqual(self.scraper.getFieldValue(), "slkna:t',si0fgu/");
+
+    def testBirthDistrict(self):        
         self.scraper.setLine("hGd :yfg M lhNnf M kfFry/<br>")
         self.assertEqual(self.scraper.getFoundField(), ProfileFields.BIRTH_DISTRICT);
-        self.assertEqual(self.scraper.getFieldValue(), "lhNnf M kfFry/");
+        self.assertEqual(self.scraper.getFieldValue(), "kfFry/");
 
     def testBirthVDC(self):
         self.scraper.setLine("hGd :yfg M lhNnf M kfFry/<br>")
+        #uf=lj=;=÷g=kf= M ODj'ª
         self.scraper.setLine("uf=lj=;=÷g=kf= M ODj'ª<br>")
         self.assertEqual(self.scraper.getFoundField(), ProfileFields.BIRTH_VDC);
         self.assertEqual(self.scraper.getFieldValue(), "ODj'ª");

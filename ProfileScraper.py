@@ -115,7 +115,23 @@ class Profile:
         return s
 
     def setFieldValue(self, field, value):
+        value = value.replace('&amp;','&');
+        value = self.translateNumbers(field, value)
         self.values[field] = value
+
+    def translateNumbers(self, field, value):
+        if field == ProfileFields.DOB:
+            replaceDict = {'1':'!','2':'@','3':'#','4':'$','5':'%','6':'^','7':'&','8':'*','9':'(','0':')','/':'='} 
+            for key, replacement in replaceDict.items():  
+                value = value.replace(key, replacement)
+            return value
+        return value
+
+    def isDate(self, value):
+        m = re.findall('([0-9/ ]*)', value)
+        if m and m[0]:
+            return True
+        return False
 
     def getUnicodeFieldValue(self, field):
         if field in self.values:

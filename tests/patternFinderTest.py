@@ -27,7 +27,7 @@ class PatternFinderTest(unittest.TestCase):
         #hGd :yfg M lhNnf M slkna:t' uf=lj=;=÷g=kf= M si0fgu/
         self.scraper.setLine("hGd :yfg M lhNnf M slkna:t' uf=lj=;=÷g=kf= M si0fgu/<br>")
         self.assertEqual(self.scraper.getFoundField(), ProfileFields.BIRTH_DISTRICT);
-        self.assertEqual(self.scraper.getFieldValue(), "slkna:t',si0fgu/");
+        self.assertEqual(self.scraper.getFieldValue(), "slkna:t', si0fgu/");
 
     def testBirthDistrict(self):        
         self.scraper.setLine("hGd :yfg M lhNnf M kfFry/<br>")
@@ -127,6 +127,22 @@ class PatternFinderTest(unittest.TestCase):
         self.scraper.setLine("/fhgLlts bndf cfa4 ePsf] jif{ M<br>")
         self.assertEqual(self.scraper.getFoundField(), ProfileFields.PARTY_STARTED_YEAR);
         self.assertEqual(self.scraper.getFieldValue(), "");
+
+    def testElectedDistrict(self):
+        self.scraper.setLine("lgjf{rg k|s[of M k|ToIf<br>")
+        self.scraper.setLine("lhNnf M slknj:t'<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.ELECTED_DISTRICT);
+        self.assertEqual(self.scraper.getFieldValue(), "slknj:t'");
+
+    def testElectedConstituency(self):
+        self.scraper.setLine("lgjf{rg k|s[of M k|ToIf")
+        self.scraper.setLine("lgjf{rg If]q g+= M !<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.ELECTED_CONSTITUENCY);
+        self.assertEqual(self.scraper.getFieldValue(), "!");
+        # self.scraper.setLine("lgjf{rg If]q g+= M<br>")
+        # self.assertEqual(self.scraper.getFoundField(), ProfileFields.ELECTED_CONSTITUENCY);
+        # self.assertEqual(self.scraper.getFieldValue(), "");
+
 
 if __name__ == "__main__":
     unittest.main()

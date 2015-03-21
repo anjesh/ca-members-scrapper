@@ -42,7 +42,8 @@ class ProfileFields:
     EDUCATION_QUALIFICATION = 120
     EDUCATION_MAJOR = 121
 
-    ELECTION_PROCESS = 500
+    ELECTED_HEADER = 499
+    ELECTED_PROCESS = 500
     ELECTED_DISTRICT = 501
     ELECTED_CONSTITUENCY = 502 
 
@@ -86,9 +87,9 @@ class ProfileFields:
             # ProfileFields.CHILDREN_DAUGHERS,
             ProfileFields.EDUCATION_QUALIFICATION,
             ProfileFields.EDUCATION_MAJOR,
-            # ProfileFields.ELECTION_PROCESS,
-            # ProfileFields.ELECTED_DISTRICT,
-            # ProfileFields.ELECTED_CONSTITUENCY,
+            ProfileFields.ELECTED_PROCESS,
+            ProfileFields.ELECTED_DISTRICT,
+            ProfileFields.ELECTED_CONSTITUENCY,
             ProfileFields.PARTY,
             ProfileFields.PARTY_STARTED_YEAR,
             # ProfileFields.POLITICAL_UNDERGROUND_YEARS,
@@ -200,7 +201,8 @@ class LinePatternFinder:
         self.checkPAddressHeader() or self.checkPAddressDistrict() or self.checkPAddressVDC() or self.checkPAddressWard() or self.checkPAddressTole() or \
         self.checkKAddressHeader() or self.checkKAddressDistrict() or self.checkKAddressVDC() or self.checkKAddressWard() or self.checkKAddressTole() or \
         self.checkEducationQualifcation() or self.checkEducationMajor() or \
-        self.checkParty() or self.checkPartyStartedYear()
+        self.checkParty() or self.checkPartyStartedYear() or \
+        self.checkElectedProcess() or self.checkElectedDistrict() or self.checkElectedConstituency() 
     
     def getProfileId(self, line):
         m = re.findall('<A name=([0-9]*)', line)
@@ -384,6 +386,29 @@ class LinePatternFinder:
         m = re.findall('/fhgLlts bndf cfa4 ePsf\] jif\{ M(.*)', self.line)
         if m and len(m):
             self.foundField = ProfileFields.PARTY_STARTED_YEAR
+            self.value = m[0]
+            return True
+        return False
+
+    def checkElectedProcess(self):
+        m = re.findall('lgjf{rg k\|s\[of M(.*)', self.line)
+        if m and m[0]:
+            self.stage = ProfileFields.ELECTED_HEADER
+            return True
+        return False
+
+    def checkElectedDistrict(self):
+        m = re.findall('lhNnf M(.*)', self.line)
+        if self.stage == ProfileFields.ELECTED_HEADER and m and m[0]:
+            self.foundField = ProfileFields.ELECTED_DISTRICT
+            self.value = m[0]
+            return True
+        return False
+
+    def checkElectedConstituency(self):
+        m = re.findall('lgjf{rg If\]q g\+= M(.*)', self.line)
+        if self.stage == ProfileFields.ELECTED_HEADER and m and m[0]:
+            self.foundField = ProfileFields.ELECTED_CONSTITUENCY
             self.value = m[0]
             return True
         return False

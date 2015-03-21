@@ -7,9 +7,9 @@ It scrapes the members profile of Constituent Assembly (CA) of Nepal from the [P
 
 * read each line of html file
 * check each line for the pattern
-* if the pattern is found, pass the patternFinder to the profileMaintaner
+* if the pattern is found, pass the patternFinder to the profileMaintainer
 * ProfileMaintainer maintains the collection of profiles 
-* CSVProfileExport takes the collection of profiles and generates csv file
+* CSVProfileExport takes the collection of profiles and generates [csv file](out/profiles.csv)
 
 ## Setup
 
@@ -19,9 +19,13 @@ It scrapes the members profile of Constituent Assembly (CA) of Nepal from the [P
 
 ### Test
 
-The tests only covers the LinePatternFinder only. 
-
 `python -m unittest tests.patternFinderTest`
+`python -m unittest tests.profileTest`
+`python -m unittest tests.profileExportTest`
+
+or
+
+Execute `bash runtest.sh` to run all above tests at once.
 
 ### Run
 
@@ -30,8 +34,8 @@ The tests only covers the LinePatternFinder only.
 
 ## TODOs
 
-* Scrape all the fields
-* Write more tests 
+* See problems with the data and there are still things that could be improved. 
+* Increase test coverage
 
 ## Problems
 

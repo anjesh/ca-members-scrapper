@@ -143,6 +143,21 @@ class PatternFinderTest(unittest.TestCase):
         self.assertEqual(self.scraper.getFoundField(), ProfileFields.ELECTED_CONSTITUENCY);
         self.assertEqual(self.scraper.getFieldValue(), "");
 
+    def testUndergroundYears(self):
+        self.scraper.setLine("s_ e\"ldut jif{ M @)%& b]lv @)^# ;Dd")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.POLITICAL_UNDERGROUND_YEARS);
+        self.assertEqual(self.scraper.getFieldValue(), "@)%& b]lv @)^# ;Dd");
+
+    def testNirwasanYears(self):
+        self.scraper.setLine("v_ lgjf{;g jif{ M !")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.POLITICAL_NIRWASAN_YEARS);
+        self.assertEqual(self.scraper.getFieldValue(), "!");
+
+    def testPrisonedStatus(self):
+        self.scraper.setLine("u_ aGbL hLjg M @ jif{<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.POLITICAL_PRISONED_STATUS);
+        self.assertEqual(self.scraper.getFieldValue(), "@ jif{");
+
     def testPastExperience(self):
         self.scraper.setLine("ljutsf] k]zf / cg'ej M lzIfs -!^ jif{_, dlxnf ;+3, blnt ;+3 / lzIfs ;+3df /xL sfo{")
         self.assertEqual(self.scraper.getFoundField(), ProfileFields.PAST_EXPERIENCE);

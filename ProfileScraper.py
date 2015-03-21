@@ -95,9 +95,9 @@ class ProfileFields:
             ProfileFields.ELECTED_CONSTITUENCY,
             ProfileFields.PARTY,
             ProfileFields.PARTY_STARTED_YEAR,
-            # ProfileFields.POLITICAL_UNDERGROUND_YEARS,
-            # ProfileFields.POLITICAL_NIRWASAN_YEARS,
-            # ProfileFields.POLITICAL_PRISONED_STATUS,
+            ProfileFields.POLITICAL_UNDERGROUND_YEARS,
+            ProfileFields.POLITICAL_NIRWASAN_YEARS,
+            ProfileFields.POLITICAL_PRISONED_STATUS,
             ProfileFields.PAST_EXPERIENCE,
             ProfileFields.PUBLICATIONS,
             ProfileFields.FOREIGN_VISITS,
@@ -268,6 +268,7 @@ class LinePatternFinder:
         self.checkEducationQualifcation() or self.checkEducationMajor() or \
         self.checkParty() or self.checkPartyStartedYear() or \
         self.checkElectedProcess() or self.checkElectedDistrict() or self.checkElectedConstituency() or \
+        self.checkUndergroundYears() or self.checkNirwasanYears() or self.checkPrisonedStatus() or \
         self.checkPastExperience() or \
         self.checkPublications() or \
         self.checkForeignVisits() or \
@@ -481,6 +482,33 @@ class LinePatternFinder:
         m = re.findall('lgjf{rg If\]q g\+= M(.*)', self.line)
         if self.stage == ProfileFields.ELECTED_HEADER and m and len(m)>0:
             self.foundField = ProfileFields.ELECTED_CONSTITUENCY
+            self.value = m[0]
+            return True
+        return False
+
+    def checkUndergroundYears(self):
+        # s_ e"ldut jif{ M @)%& b]lv @)^# ;Dd
+        m = re.findall('s_ e"ldut jif{ M(.*)', self.line)
+        if m and len(m)>0:
+            self.foundField = ProfileFields.POLITICAL_UNDERGROUND_YEARS
+            self.value = m[0]
+            return True
+        return False
+
+    def checkNirwasanYears(self):
+        # v_ lgjf{;g jif{ M !
+        m = re.findall('v_ lgjf{;g jif{ M(.*)', self.line)
+        if m and len(m)>0:
+            self.foundField = ProfileFields.POLITICAL_NIRWASAN_YEARS
+            self.value = m[0]
+            return True
+        return False
+
+    def checkPrisonedStatus(self):
+        # u_ aGbL hLjg M @ jif{
+        m = re.findall('u_ aGbL hLjg M(.*)', self.line)
+        if m and len(m)>0:
+            self.foundField = ProfileFields.POLITICAL_PRISONED_STATUS
             self.value = m[0]
             return True
         return False

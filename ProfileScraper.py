@@ -58,6 +58,9 @@ class ProfileFields:
 
     PUBLICATIONS = 130
     FOREIGN_VISITS = 140
+    OTHER_INFO = 150
+
+    PAGE_NUMBER = 1000
 
     @staticmethod
     def getFieldOrder():
@@ -97,7 +100,7 @@ class ProfileFields:
             # ProfileFields.POLITICAL_PRISONED_STATUS,
             # ProfileFields.PAST_EXPERIENCE,
             # ProfileFields.PUBLICATIONS,
-            # ProfileFields.FOREIGN_VISITS,            
+            ProfileFields.FOREIGN_VISITS,       
         ]        
 
 class Profile: 
@@ -118,7 +121,7 @@ class Profile:
     def setFieldValue(self, field, value):
         value = value.replace('&amp;','&');
         value = self.translateNumbers(field, value)
-        self.values[field] = value
+        self.values[field] = value.strip()
 
     def translateNumbers(self, field, value):
         if field == ProfileFields.DOB:
@@ -171,8 +174,12 @@ class ProfileMaintainer:
 
     def setLinePatternFinder(self, linePatternFinder):
         if linePatternFinder.getFoundField():
-            self.profile.setFieldValue(linePatternFinder.getFoundField(), linePatternFinder.getFieldValue())
-        if linePatternFinder.getFoundField() == ProfileFields.PARTY_STARTED_YEAR:
+            if linePatternFinder.getFoundField() == ProfileFields.FOREIGN_VISITS:
+                previousValue = self.profile.values[ProfileFields.FOREIGN_VISITS] if ProfileFields.FOREIGN_VISITS in self.profile.values else ""
+                self.profile.setFieldValue(ProfileFields.FOREIGN_VISITS, str(previousValue) + " " + str(linePatternFinder.getFieldValue()))
+            else:
+                self.profile.setFieldValue(linePatternFinder.getFoundField(), linePatternFinder.getFieldValue())
+        if linePatternFinder.getFoundField() == ProfileFields.OTHER_INFO:
             self.profiles.append(copy.copy(self.profile))
             self.profile.reset()
 
@@ -202,7 +209,12 @@ class LinePatternFinder:
         self.checkKAddressHeader() or self.checkKAddressDistrict() or self.checkKAddressVDC() or self.checkKAddressWard() or self.checkKAddressTole() or \
         self.checkEducationQualifcation() or self.checkEducationMajor() or \
         self.checkParty() or self.checkPartyStartedYear() or \
-        self.checkElectedProcess() or self.checkElectedDistrict() or self.checkElectedConstituency() 
+        self.checkElectedProcess() or self.checkElectedDistrict() or self.checkElectedConstituency() or \
+        self.checkForeignVisits() or \
+        self.checkOtherInfo() or \
+        self.checkEndPageNumber() or \
+        self.checkFreeText() 
+        
     
     def getProfileId(self, line):
         m = re.findall('<A name=([0-9]*)', line)
@@ -407,8 +419,45 @@ class LinePatternFinder:
 
     def checkElectedConstituency(self):
         m = re.findall('lgjf{rg If\]q g\+= M(.*)', self.line)
-        if self.stage == ProfileFields.ELECTED_HEADER and m and m[0]:
+        if self.stage == ProfileFields.ELECTED_HEADER and m and len(m)>0:
             self.foundField = ProfileFields.ELECTED_CONSTITUENCY
             self.value = m[0]
             return True
         return False
+
+    def checkForeignVisits(self):
+        m = re.findall('ljb\]z e\|d0f M(.*)', self.line)
+        if m and m[0]:
+            self.stage = ProfileFields.FOREIGN_VISITS
+            self.foundField = ProfileFields.FOREIGN_VISITS
+            self.value = m[0]
+            return True
+        return False
+
+    def checkFreeText(self):
+        m = re.findall('^(.*)$', self.line)
+        if self.stage == ProfileFields.FOREIGN_VISITS and m and m[0]:
+            self.foundField = ProfileFields.FOREIGN_VISITS
+            self.value = m[0]
+            return True
+        return False
+
+    def checkOtherInfo(self):
+        m = re.findall('cGo M(.*)', self.line)
+        if m and len(m)>0:
+            self.stage = 0
+            self.foundField = ProfileFields.OTHER_INFO
+            self.value = m[0]
+            return True
+        return False
+
+    def checkEndPageNumber(self):
+        #2<br>
+        m = re.findall('^([0-9]+)$', self.line)
+        if m and m[0]:
+            self.stage = 0
+            self.foundField = ProfileFields.PAGE_NUMBER
+            self.value = ""
+            return True
+        return False
+        

@@ -139,10 +139,28 @@ class PatternFinderTest(unittest.TestCase):
         self.scraper.setLine("lgjf{rg If]q g+= M !<br>")
         self.assertEqual(self.scraper.getFoundField(), ProfileFields.ELECTED_CONSTITUENCY);
         self.assertEqual(self.scraper.getFieldValue(), "!");
-        # self.scraper.setLine("lgjf{rg If]q g+= M<br>")
-        # self.assertEqual(self.scraper.getFoundField(), ProfileFields.ELECTED_CONSTITUENCY);
-        # self.assertEqual(self.scraper.getFieldValue(), "");
+        self.scraper.setLine("lgjf{rg If]q g+= M<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.ELECTED_CONSTITUENCY);
+        self.assertEqual(self.scraper.getFieldValue(), "");
 
+    def testForeignVisits(self):
+        self.scraper.setLine("ljb]z e|d0f M ef/t, rLg, hfkfg, yfO{Nof08, kfls:tfg, j]nfot, hd{gL, k|mfG;, 8]gdfs{,")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.FOREIGN_VISITS);
+        self.assertEqual(self.scraper.getFieldValue(), "ef/t, rLg, hfkfg, yfO{Nof08, kfls:tfg, j]nfot, hd{gL, k|mfG;, 8]gdfs{,");
+
+    def testForeignVisitsMultiLine(self):
+        self.scraper.setLine("ljb]z e|d0f M ef/t, rLg, hfkfg, yfO{Nof08, kfls:tfg, j]nfot, hd{gL, k|mfG;, 8]gdfs{,")
+        self.scraper.setLine(":jL8]g, cd]l/sf, stf/ nufotsf b]zx? .")              
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.FOREIGN_VISITS);
+        self.assertEqual(self.scraper.getFieldValue(), ":jL8]g, cd]l/sf, stf/ nufotsf b]zx? .");
+
+    def testOtherInfo(self):
+        self.scraper.setLine("cGo M @)$")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.OTHER_INFO);
+        self.assertEqual(self.scraper.getFieldValue(), "@)$");
+        self.scraper.setLine("cGo M")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.OTHER_INFO);
+        self.assertEqual(self.scraper.getFieldValue(), "");
 
 if __name__ == "__main__":
     unittest.main()

@@ -17,6 +17,7 @@ class Profile1Test(unittest.TestCase):
             count = 1
             for line in f:
                 scraper.setLine(line)
+                # print line
                 if scraper.getFoundField():
                     if scraper.getFoundField() == ProfileFields.NAME:
                         profileId = scraper.getProfileId(line)
@@ -25,13 +26,15 @@ class Profile1Test(unittest.TestCase):
         return profileMaintainer
 
     def testProfile1(self):
-        profileMaintainer = self.getProfileMaintainer('tests/data1.html')
+        profileMaintainer = self.getProfileMaintainer('tests/data1.html')        
         profile = profileMaintainer.profiles[0]
         self.assertEqual(profile.values[ProfileFields.NAME], "cOGb| ;'Gb/ g]DjfË")
         self.assertEqual(profile.values[ProfileFields.DOB], profile.translateNumbers(ProfileFields.DOB, "2034/07/12"))
         self.assertEqual(profile.values[ProfileFields.BIRTH_DISTRICT], "kfFry/")
         self.assertEqual(profile.values[ProfileFields.BIRTH_VDC], "ODj'ª")
         self.assertEqual(profile.values[ProfileFields.BIRTH_WARD], "!")
+        self.assertEqual(profile.values[ProfileFields.FOREIGN_VISITS], "ef/t, rLg, hfkfg, yfO{Nof08, kfls:tfg, j]nfot, hd{gL, k|mfG;, 8]gdfs{, :jL8]g, cd]l/sf, stf/ nufotsf b]zx? .")
+        
         # self.assertEqual(profile.values[ProfileFields.NAME], "cOGb| ;'Gb/ g]DjfË")
         # self.assertEqual(profile.values[ProfileFields.NAME], "cOGb| ;'Gb/ g]DjfË")
         # self.assertEqual(profile.values[ProfileFields.NAME], "cOGb| ;'Gb/ g]DjfË")

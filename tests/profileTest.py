@@ -28,7 +28,7 @@ class Profile1Test(unittest.TestCase):
         profileMaintainer = self.getProfileMaintainer('tests/data1.html')
         profile = profileMaintainer.profiles[0]
         self.assertEqual(profile.values[ProfileFields.NAME], "cOGb| ;'Gb/ g]DjfË")
-        self.assertEqual(profile.values[ProfileFields.DOB], "2034/07/12")
+        self.assertEqual(profile.values[ProfileFields.DOB], profile.translateNumbers(ProfileFields.DOB, "2034/07/12"))
         self.assertEqual(profile.values[ProfileFields.BIRTH_DISTRICT], "kfFry/")
         self.assertEqual(profile.values[ProfileFields.BIRTH_VDC], "ODj'ª")
         self.assertEqual(profile.values[ProfileFields.BIRTH_WARD], "!")
@@ -43,7 +43,7 @@ class Profile1Test(unittest.TestCase):
         profileMaintainer = self.getProfileMaintainer('tests/data2.html')
         profile = profileMaintainer.profiles[0]
         self.assertEqual(profile.values[ProfileFields.NAME], "csafn cxdb zfx")
-        self.assertEqual(profile.values[ProfileFields.DOB], "!(^) km]a|'j/L !!")
-        self.assertEqual(profile.values[ProfileFields.BIRTH_DISTRICT], "slkna:t',si0fgu/")
+        self.assertEqual(profile.values[ProfileFields.DOB], profile.translateNumbers(ProfileFields.DOB, "!(^) km]a|'j/L !!"))
+        self.assertEqual(profile.values[ProfileFields.BIRTH_DISTRICT], "slkna:t', si0fgu/")
         # self.assertEqual(profile.values[ProfileFields.BIRTH_VDC], "")
         # self.assertEqual(profile.values[ProfileFields.BIRTH_WARD], "&")

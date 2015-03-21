@@ -111,7 +111,7 @@ class Profile:
     def __str__(self):
         s = ""
         for f in self.values:
-            s = s + "\r\nField " + str(f) + ": " + getUnicodeFieldValue(self.values[f])
+            s = s + "\r\nField " + str(f) + ": " + self.getUnicodeFieldValue(self.values[f])
         return s
 
     def setFieldValue(self, field, value):
@@ -129,7 +129,8 @@ class CSVProfileExport:
     def __init__(self, filename, profiles):
         self.outfile = open(filename, 'w')
         self.csvwriter = csv.writer(self.outfile, delimiter=',',quotechar='"')
-        self.setProfiles(profiles)
+        if profiles:
+            self.setProfiles(profiles)
 
     def setProfiles(self, profiles):
         self.profiles = profiles
@@ -179,7 +180,7 @@ class LinePatternFinder:
     def process(self):
         self.checkName() or \
         self.checkDob() or \
-        self.checkBirthDistrict() or self.checkBirthVDC() or self.checkBirthWard() or \
+        self.checkBirthDistrictVDC() or self.checkBirthDistrict() or self.checkBirthVDC() or self.checkBirthWard() or \
         self.checkPAddressHeader() or self.checkPAddressDistrict() or self.checkPAddressVDC() or self.checkPAddressWard() or self.checkPAddressTole() or \
         self.checkKAddressHeader() or self.checkKAddressDistrict() or self.checkKAddressVDC() or self.checkKAddressWard() or self.checkKAddressTole() or \
         self.checkEducationQualifcation() or self.checkEducationMajor() or \
@@ -209,9 +210,20 @@ class LinePatternFinder:
             return True
         return False
 
+    def checkBirthDistrictVDC(self):
+        # there are cases where district and vdc appears in the same line
+        # hGd :yfg M lhNnf M slkna:t' uf=lj=;=÷g=kf= M si0fgu/
+        # include both district and vdc in the same field. We will have to manually get to the vdc field.
+        m = re.findall('hGd :yfg M lhNnf M (.*) uf=lj=;=÷g=kf= M (.*)', self.line)
+        if m and m[0]:
+            self.stage = ProfileFields.BIRTH_HEADER
+            self.foundField = ProfileFields.BIRTH_DISTRICT
+            self.value = m[0][0] + "," + m[0][1]
+            return True
+        return False
+
     def checkBirthDistrict(self):
-        # hGd :yfg M lhNnf M kfFry/<br>
-        m = re.findall('hGd :yfg M (.*)', self.line)
+        m = re.findall('hGd :yfg M lhNnf M (.*)', self.line)
         if m and m[0]:
             self.stage = ProfileFields.BIRTH_HEADER
             self.foundField = ProfileFields.BIRTH_DISTRICT
@@ -220,8 +232,8 @@ class LinePatternFinder:
         return False
 
     def checkBirthVDC(self):
-        # uf=lj=;=÷g=kf= M ODj'ª<br>
-        m = re.findall('uf=lj=;=÷g=kf= M (.*)', self.line)
+        # uf=lj=;=÷g=kf= M ODj'ª<br>        ÷
+        m = re.findall('uf=lj=;=÷g=kf= M(.*)', self.line)
         if self.stage == ProfileFields.BIRTH_HEADER and m and m[0]:
             self.foundField = ProfileFields.BIRTH_VDC
             self.value = m[0]

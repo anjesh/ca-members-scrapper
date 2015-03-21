@@ -214,7 +214,7 @@ class LinePatternFinder:
         # there are cases where district and vdc appears in the same line
         # hGd :yfg M lhNnf M slkna:t' uf=lj=;=÷g=kf= M si0fgu/
         # include both district and vdc in the same field. We will have to manually get to the vdc field.
-        m = re.findall('hGd :yfg M lhNnf M (.*) uf=lj=;=÷g=kf= M (.*)', self.line)
+        m = re.findall('hGd :yfg M lhNnf M (.*) uf=lj=;=÷g=kf= M(.*)', self.line)
         if m and m[0]:
             self.stage = ProfileFields.BIRTH_HEADER
             self.foundField = ProfileFields.BIRTH_DISTRICT

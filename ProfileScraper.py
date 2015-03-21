@@ -103,7 +103,50 @@ class ProfileFields:
             ProfileFields.FOREIGN_VISITS,
             ProfileFields.OTHER_INFO,
             ProfileFields.PAGE_NUMBER   
-        ]        
+        ]   
+
+    @staticmethod
+    def getFieldHeader():
+        return {
+            ProfileFields.NAME : "Name",
+            ProfileFields.DOB : "Dob",
+            ProfileFields.BIRTH_DISTRICT : "Birth_district",
+            ProfileFields.BIRTH_VDC : "Birth_vdc",
+            ProfileFields.BIRTH_WARD : "Birth_ward",
+            ProfileFields.PADDRESS_DISTRICT : "Paddress_district",
+            ProfileFields.PADDRESS_VDC : "Paddress_vdc",
+            ProfileFields.PADDRESS_WARD : "Paddress_ward",
+            ProfileFields.PADDRESS_TOLE : "Paddress_tole",
+            ProfileFields.KADDRESS_DISTRICT : "Kaddress_district",
+            ProfileFields.KADDRESS_VDC : "Kaddress_vdc",
+            ProfileFields.KADDRESS_WARD : "Kaddress_ward",
+            ProfileFields.KADDRESS_TOLE : "Kaddress_tole",
+            ProfileFields.CONTACT_MOBILE : "Contact_mobile",
+            ProfileFields.CONTACT_EMAIL : "Contact_email",
+            ProfileFields.CONTACT_PHONE_VALLEY : "Contact_phone_valley",
+            ProfileFields.CONTACT_PHONE_DISTRICT : "Contact_phone_district",
+            ProfileFields.FATHER_NAME : "Father_name",
+            ProfileFields.MOTHER_NAME : "Mother_name",
+            ProfileFields.MARITAL_STATUS : "Marital_status",
+            ProfileFields.SPOUSE_NAME : "Spouse_name",
+            ProfileFields.CHILDREN_SONS : "Children_sons",
+            ProfileFields.CHILDREN_DAUGHERS : "Children_daughers",
+            ProfileFields.EDUCATION_QUALIFICATION : "Education_qualification",
+            ProfileFields.EDUCATION_MAJOR : "Education_major",
+            ProfileFields.ELECTED_PROCESS : "Elected_process",
+            ProfileFields.ELECTED_DISTRICT : "Elected_district",
+            ProfileFields.ELECTED_CONSTITUENCY : "Elected_constituency",
+            ProfileFields.PARTY : "Party",
+            ProfileFields.PARTY_STARTED_YEAR : "Party_started_year",
+            ProfileFields.POLITICAL_UNDERGROUND_YEARS : "Political_underground_years",
+            ProfileFields.POLITICAL_NIRWASAN_YEARS : "Political_nirwasan_years",
+            ProfileFields.POLITICAL_PRISONED_STATUS : "Political_prisoned_status",
+            ProfileFields.PAST_EXPERIENCE : "Past_experience",
+            ProfileFields.PUBLICATIONS : "Publications",
+            ProfileFields.FOREIGN_VISITS : "Foreign_visits",
+            ProfileFields.OTHER_INFO : "Other_info",
+            ProfileFields.PAGE_NUMBER : "Page_number",      
+        }     
 
 class Profile: 
     def __init__(self):
@@ -159,7 +202,16 @@ class CSVProfileExport:
         self.profiles = profiles
         self.process()
 
+    def getHeader(self):
+        row = []
+        header = ProfileFields.getFieldHeader()
+        for field in ProfileFields.getFieldOrder():
+            row.append(header[field])
+        return row
+
+
     def process(self):
+        self.csvwriter.writerow(self.getHeader())
         for p in self.profiles:
             self.csvwriter.writerow(self.getCSVRow(p))
 

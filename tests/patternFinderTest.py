@@ -143,6 +143,25 @@ class PatternFinderTest(unittest.TestCase):
         self.assertEqual(self.scraper.getFoundField(), ProfileFields.ELECTED_CONSTITUENCY);
         self.assertEqual(self.scraper.getFieldValue(), "");
 
+    def testPastExperience(self):
+        self.scraper.setLine("ljutsf] k]zf / cg'ej M lzIfs -!^ jif{_, dlxnf ;+3, blnt ;+3 / lzIfs ;+3df /xL sfo{")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.PAST_EXPERIENCE);
+        self.assertEqual(self.scraper.getFieldValue(), "lzIfs -!^ jif{_, dlxnf ;+3, blnt ;+3 / lzIfs ;+3df /xL sfo{");
+        self.scraper.setLine("ljutsf] k]zf / cg'ej M sfg&quot;g Joj;foL")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.PAST_EXPERIENCE);
+        self.assertEqual(self.scraper.getFieldValue(), "sfg&quot;g Joj;foL");
+
+    def testPastExperienceMultiLine(self):
+        self.scraper.setLine("ljutsf] k]zf / cg'ej M lzIfs -!^ jif{_, dlxnf ;+3, blnt ;+3 / lzIfs ;+3df /xL sfo{")
+        self.scraper.setLine("u/]sf] . g]kfnL sfFu|]; lhNnf ;b:o, g]kfnL sfFu|]; s]Gb|Lo ;b:o -jg")              
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.PAST_EXPERIENCE);
+        self.assertEqual(self.scraper.getFieldValue(), "u/]sf] . g]kfnL sfFu|]; lhNnf ;b:o, g]kfnL sfFu|]; s]Gb|Lo ;b:o -jg");
+
+    def testPublications(self):
+        self.scraper.setLine("s[lt÷k|sfzg M<br>")
+        self.assertEqual(self.scraper.getFoundField(), ProfileFields.PUBLICATIONS);
+        self.assertEqual(self.scraper.getFieldValue(), "");
+
     def testForeignVisits(self):
         self.scraper.setLine("ljb]z e|d0f M ef/t, rLg, hfkfg, yfO{Nof08, kfls:tfg, j]nfot, hd{gL, k|mfG;, 8]gdfs{,")
         self.assertEqual(self.scraper.getFoundField(), ProfileFields.FOREIGN_VISITS);

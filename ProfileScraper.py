@@ -54,7 +54,7 @@ class ProfileFields:
     POLITICAL_NIRWASAN_YEARS = 506
     POLITICAL_PRISONED_STATUS = 507
 
-    PAST_EXPERIENCE = 120
+    PAST_EXPERIENCE = 125
 
     PUBLICATIONS = 130
     FOREIGN_VISITS = 140
@@ -98,9 +98,11 @@ class ProfileFields:
             # ProfileFields.POLITICAL_UNDERGROUND_YEARS,
             # ProfileFields.POLITICAL_NIRWASAN_YEARS,
             # ProfileFields.POLITICAL_PRISONED_STATUS,
-            # ProfileFields.PAST_EXPERIENCE,
-            # ProfileFields.PUBLICATIONS,
-            ProfileFields.FOREIGN_VISITS,       
+            ProfileFields.PAST_EXPERIENCE,
+            ProfileFields.PUBLICATIONS,
+            ProfileFields.FOREIGN_VISITS,
+            ProfileFields.OTHER_INFO,
+            ProfileFields.PAGE_NUMBER   
         ]        
 
 class Profile: 
@@ -120,11 +122,12 @@ class Profile:
 
     def setFieldValue(self, field, value):
         value = value.replace('&amp;','&');
+        value = value.replace('&quot;','"');
         value = self.translateNumbers(field, value)
         self.values[field] = value.strip()
 
     def translateNumbers(self, field, value):
-        if field == ProfileFields.DOB:
+        if field in [ProfileFields.DOB, ProfileFields.PAGE_NUMBER]:
             replaceDict = {'1':'!','2':'@','3':'#','4':'$','5':'%','6':'^','7':'&','8':'*','9':'(','0':')','/':'='} 
             for key, replacement in replaceDict.items():  
                 value = value.replace(key, replacement)
@@ -172,11 +175,14 @@ class ProfileMaintainer:
         self.profile = Profile()
         self.profiles = []
 
+    def getMultiLineFieldValue(self, field, linePatternFinder):
+            previousValue = self.profile.values[field] if field in self.profile.values else ""
+            return str(previousValue) + " " + str(linePatternFinder.getFieldValue())
+
     def setLinePatternFinder(self, linePatternFinder):
         if linePatternFinder.getFoundField():
-            if linePatternFinder.getFoundField() == ProfileFields.FOREIGN_VISITS:
-                previousValue = self.profile.values[ProfileFields.FOREIGN_VISITS] if ProfileFields.FOREIGN_VISITS in self.profile.values else ""
-                self.profile.setFieldValue(ProfileFields.FOREIGN_VISITS, str(previousValue) + " " + str(linePatternFinder.getFieldValue()))
+            if linePatternFinder.getFoundField() in [ProfileFields.FOREIGN_VISITS, ProfileFields.PAST_EXPERIENCE]:
+                self.profile.setFieldValue(linePatternFinder.getFoundField(), self.getMultiLineFieldValue(linePatternFinder.getFoundField(), linePatternFinder))
             else:
                 self.profile.setFieldValue(linePatternFinder.getFoundField(), linePatternFinder.getFieldValue())
         if linePatternFinder.getFoundField() == ProfileFields.OTHER_INFO:
@@ -210,6 +216,8 @@ class LinePatternFinder:
         self.checkEducationQualifcation() or self.checkEducationMajor() or \
         self.checkParty() or self.checkPartyStartedYear() or \
         self.checkElectedProcess() or self.checkElectedDistrict() or self.checkElectedConstituency() or \
+        self.checkPastExperience() or \
+        self.checkPublications() or \
         self.checkForeignVisits() or \
         self.checkOtherInfo() or \
         self.checkEndPageNumber() or \
@@ -425,6 +433,27 @@ class LinePatternFinder:
             return True
         return False
 
+    def checkPastExperience(self):
+        #ljutsf] k]zf / cg'ej M lzIfs -
+        m = re.findall('^ljutsf\] k\]zf / cg\'ej M(.*)', self.line)
+        if m and len(m)>0:
+            self.stage = ProfileFields.PAST_EXPERIENCE
+            self.foundField = ProfileFields.PAST_EXPERIENCE
+            self.value = m[0]
+            return True
+        return False
+
+    def checkPublications(self):
+        # s[ltÃ·k|sfzg M
+        # s[lt÷k|sfzg M<br>
+        m = re.findall('s\[lt÷k\|sfzg M(.*)', self.line)
+        if m and len(m)>0:
+            self.stage = 0
+            self.foundField = ProfileFields.PUBLICATIONS
+            self.value = m[0]
+            return True
+        return False
+
     def checkForeignVisits(self):
         m = re.findall('ljb\]z e\|d0f M(.*)', self.line)
         if m and m[0]:
@@ -436,6 +465,10 @@ class LinePatternFinder:
 
     def checkFreeText(self):
         m = re.findall('^(.*)$', self.line)
+        if self.stage == ProfileFields.PAST_EXPERIENCE and m and m[0]:
+            self.foundField = ProfileFields.PAST_EXPERIENCE
+            self.value = m[0]
+            return True
         if self.stage == ProfileFields.FOREIGN_VISITS and m and m[0]:
             self.foundField = ProfileFields.FOREIGN_VISITS
             self.value = m[0]
@@ -457,7 +490,7 @@ class LinePatternFinder:
         if m and m[0]:
             self.stage = 0
             self.foundField = ProfileFields.PAGE_NUMBER
-            self.value = ""
+            self.value = m[0]
             return True
         return False
         

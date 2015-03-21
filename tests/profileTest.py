@@ -33,14 +33,14 @@ class Profile1Test(unittest.TestCase):
         self.assertEqual(profile.values[ProfileFields.BIRTH_DISTRICT], "kfFry/")
         self.assertEqual(profile.values[ProfileFields.BIRTH_VDC], "ODj'ª")
         self.assertEqual(profile.values[ProfileFields.BIRTH_WARD], "!")
+        self.assertEqual(profile.values[ProfileFields.ELECTED_DISTRICT], "kfFry/")
+        self.assertEqual(profile.values[ProfileFields.ELECTED_CONSTITUENCY], "")
+        self.assertEqual(profile.values[ProfileFields.PARTY], "g]skf -dfn]_")
+        self.assertEqual(profile.values[ProfileFields.PARTY_STARTED_YEAR], "@)$% ;fn")
+        self.assertEqual(profile.values[ProfileFields.PAST_EXPERIENCE], "")
+        self.assertEqual(profile.values[ProfileFields.PUBLICATIONS], "dfu{lrq ;fKtflxs ænfdÆ")
+        #multiline foreign visits
         self.assertEqual(profile.values[ProfileFields.FOREIGN_VISITS], "ef/t, rLg, hfkfg, yfO{Nof08, kfls:tfg, j]nfot, hd{gL, k|mfG;, 8]gdfs{, :jL8]g, cd]l/sf, stf/ nufotsf b]zx? .")
-        
-        # self.assertEqual(profile.values[ProfileFields.NAME], "cOGb| ;'Gb/ g]DjfË")
-        # self.assertEqual(profile.values[ProfileFields.NAME], "cOGb| ;'Gb/ g]DjfË")
-        # self.assertEqual(profile.values[ProfileFields.NAME], "cOGb| ;'Gb/ g]DjfË")
-        # self.assertEqual(profile.values[ProfileFields.NAME], "cOGb| ;'Gb/ g]DjfË")
-        # self.assertEqual(profile.values[ProfileFields.NAME], "cOGb| ;'Gb/ g]DjfË")
-            # print profile.getUnicodeFieldValue(field).encode('utf-8')
 
     def testProfile2(self):
         profileMaintainer = self.getProfileMaintainer('tests/data2.html')
@@ -48,5 +48,7 @@ class Profile1Test(unittest.TestCase):
         self.assertEqual(profile.values[ProfileFields.NAME], "csafn cxdb zfx")
         self.assertEqual(profile.values[ProfileFields.DOB], profile.translateNumbers(ProfileFields.DOB, "!(^) km]a|'j/L !!"))
         self.assertEqual(profile.values[ProfileFields.BIRTH_DISTRICT], "slkna:t', si0fgu/")
+        self.assertEqual(profile.values[ProfileFields.PAST_EXPERIENCE], "sfg\"g Joj;foL")
+        self.assertEqual(profile.values[ProfileFields.FOREIGN_VISITS], "cd]l/sf, ?;, ax/fOg, ;fpbL c/laof, a+unfb]z / ef/t .")
         # self.assertEqual(profile.values[ProfileFields.BIRTH_VDC], "")
         # self.assertEqual(profile.values[ProfileFields.BIRTH_WARD], "&")

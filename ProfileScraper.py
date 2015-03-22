@@ -245,7 +245,7 @@ class ProfileMaintainer:
                 self.profile.setFieldValue(linePatternFinder.getFoundField(), self.getMultiLineFieldValue(linePatternFinder.getFoundField(), linePatternFinder))
             else:
                 self.profile.setFieldValue(linePatternFinder.getFoundField(), linePatternFinder.getFieldValue())
-        if linePatternFinder.getFoundField() == ProfileFields.OTHER_INFO:
+        if linePatternFinder.getFoundField() == ProfileFields.PAGE_NUMBER:
             self.profiles.append(copy.copy(self.profile))
             self.profile.reset()
 

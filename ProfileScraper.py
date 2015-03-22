@@ -678,7 +678,7 @@ class LinePatternFinder:
 
     def checkEndPageNumber(self):
         #2<br>
-        m = re.findall('^([0-9]+)$', self.line)
+        m = re.findall('^([0-9]{1,3})$', self.line)
         if m and m[0]:
             self.stage = 0
             self.foundField = ProfileFields.PAGE_NUMBER
